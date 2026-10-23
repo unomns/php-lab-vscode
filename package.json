@@ -1,0 +1,157 @@
+{
+  "name": "php-lab-vscode",
+  "displayName": "PHP Lab",
+  "description": "Run PHP snippets and // %% cells right in the editor with your local PHP — like Jupyter cells meets an online PHP sandbox.",
+  "version": "0.1.0",
+  "publisher": "unomns",
+  "author": {
+    "name": "unomns"
+  },
+  "license": "GPL-3.0-only",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#4F5B93",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unomns/php-lab-vscode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/unomns/php-lab-vscode/issues"
+  },
+  "homepage": "https://github.com/unomns/php-lab-vscode#readme",
+  "keywords": [
+    "php",
+    "run",
+    "runner",
+    "sandbox",
+    "playground",
+    "scratch",
+    "snippet",
+    "cells",
+    "jupyter",
+    "repl",
+    "tinker"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "pricing": "Free",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onLanguage:php"
+  ],
+  "main": "./out/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In Restricted Mode, a phpPath set in the workspace settings is ignored, so an untrusted folder can't choose which program is run.",
+      "restrictedConfigurations": [
+        "phpLab.phpPath"
+      ]
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "phpLab.runSelection",
+        "title": "Run Selection",
+        "category": "PHP",
+        "icon": "$(play)"
+      },
+      {
+        "command": "phpLab.runCell",
+        "title": "Run Cell",
+        "category": "PHP",
+        "icon": "$(play)"
+      },
+      {
+        "command": "phpLab.newScratchFile",
+        "title": "New Scratch File",
+        "category": "PHP",
+        "icon": "$(new-file)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "phpLab.runSelection",
+          "when": "editorLangId == php"
+        },
+        {
+          "command": "phpLab.runCell",
+          "when": "false"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "phpLab.runSelection",
+          "when": "editorLangId == php",
+          "group": "navigation@100"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "phpLab.runSelection",
+        "key": "ctrl+alt+enter",
+        "mac": "cmd+alt+enter",
+        "when": "editorTextFocus && editorLangId == php && !notebookEditorFocused && !inChat"
+      }
+    ],
+    "configuration": {
+      "title": "PHP Lab",
+      "properties": {
+        "phpLab.phpPath": {
+          "type": "string",
+          "default": "php",
+          "scope": "machine-overridable",
+          "markdownDescription": "The PHP executable: a command on your `PATH` (default `php`) or a full path such as `/opt/homebrew/bin/php` or `C:\\php\\php.exe`. With the default value, common install locations (Homebrew, Laravel Herd, XAMPP, …) are searched too."
+        },
+        "phpLab.timeout": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "markdownDescription": "Stop the PHP process after this many **seconds**."
+        },
+        "phpLab.showInlineResult": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Show a short result after the last line of the code that ran. Hover over it to see the full output."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src",
+    "test": "npm run compile && mocha --ui tdd \"out/test/unit/**/*.test.js\"",
+    "test:integration": "npm run compile && vscode-test",
+    "package": "vsce package",
+    "publish:marketplace": "vsce publish",
+    "publish:openvsx": "ovsx publish"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^18.19.130",
+    "@types/vscode": "~1.85.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
+    "@vscode/vsce": "^4.0.0",
+    "eslint": "^10.5.0",
+    "mocha": "^12.0.3",
+    "ovsx": "^1.3.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.6"
+  }
+}

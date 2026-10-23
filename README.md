@@ -11,7 +11,8 @@ Jupyter-style cells and an online PHP sandbox.
 - **Run Selection** — select some PHP and press <kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>Enter</kbd>
   (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Enter</kbd> on Windows/Linux). Nothing selected? The current cell runs.
 - **Cells** — split a `.php` file into cells with `// %%` lines, then click **▶ Run Cell** above any cell.
-- **Scratch files** — **PHP: New Scratch File** opens an untitled PHP file with sample cells, like an online sandbox.
+- **Scratch files** — **PHP: New Scratch File** creates a PHP file with sample code, like an online sandbox.
+  Scratches are real files, listed in a **Scratches** view in the Explorer sidebar.
 - **Output** — stdout and stderr stream into the **PHP Lab** Output panel, with the PHP version and execution time.
 - **Inline results** — a short result appears after the last line that ran (`⇒ Hello · 3 ms`). Hover over it for the full output.
 - **Clear errors** — errors and warnings are reported with the line number *in your file*
@@ -57,8 +58,9 @@ sort($numbers);
 print_r($numbers);
 ```
 
-A **▶ Run Cell** link appears above every cell. A file without `// %%` lines is a single cell,
-so the shortcut runs the whole file.
+A **▶ Run Cell** link appears above every cell. A cell goes from the line after its `// %%`
+to the line before the next `// %%` (or to the end of the file); blank lines don't end a cell.
+A file without `// %%` lines is a single cell, so the shortcut runs the whole file.
 
 ### Running code
 
@@ -68,19 +70,39 @@ so the shortcut runs the whole file.
 | Press the shortcut with nothing selected  | the cell under the cursor        |
 | Click **▶ Run Cell**                      | that cell                        |
 
-Each run is independent: variables from one run are **not** available in the next
-(see the [roadmap](#roadmap)). The code runs with the file's folder as the working directory
-(your home folder for unsaved files), so relative paths work like in a terminal.
+Each run is plain PHP on its own: no project code (Composer autoloader, framework) is loaded,
+and variables from one run are **not** available in the next. The code runs with the file's
+folder as the working directory (your home folder for unsaved files), so relative paths work
+like in a terminal. For code that needs your application, use a debugger such as Xdebug or
+your framework's REPL (e.g. `php artisan tinker`).
 
 You don't need to write `<?php` (it's added for you), but it's fine if your code has it.
 A trailing `?>` is removed.
+
+### Scratch files
+
+Scratches are listed in the **Scratches** view in the Explorer sidebar (below your project
+folder and Timeline), newest first. Click one to open it.
+
+- **+** in the view's title bar (or **PHP: New Scratch File**) creates a new scratch,
+  e.g. `scratch-20261024-043712.php`, with sample code and one `// %%` line at the top,
+  so its **▶ Run Cell** button runs the whole scratch.
+- Right-click a scratch to **Rename…** or **Delete** it (deleted files go to the trash).
+- The folder button reveals the scratches folder in Finder / File Explorer.
+
+Scratches are kept in PHP Lab's own storage folder, not in your projects, so they are the same in
+every window and survive closing VS Code. Save your changes as usual (<kbd>Cmd/Ctrl</kbd>+<kbd>S</kbd>,
+or turn on VS Code's Auto Save). Scratches run with their own folder as the working directory, so
+files they create with relative paths end up next to them.
+
+To move or hide the view, right-click the Explorer's view headers.
 
 ### Commands
 
 | Command                  | Description                                            |
 |--------------------------|--------------------------------------------------------|
 | `PHP: Run Selection`     | Run the selection, or the current cell if nothing is selected |
-| `PHP: New Scratch File`  | Open an untitled PHP file with sample cells            |
+| `PHP: New Scratch File`  | Create a scratch file with sample code                 |
 
 `PHP: Run Selection` is also in the editor's right-click menu.
 

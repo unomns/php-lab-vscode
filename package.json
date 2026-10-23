@@ -73,7 +73,24 @@
         "command": "phpLab.newScratchFile",
         "title": "New Scratch File",
         "category": "PHP",
-        "icon": "$(new-file)"
+        "icon": "$(add)"
+      },
+      {
+        "command": "phpLab.renameScratchFile",
+        "title": "Rename…",
+        "category": "PHP"
+      },
+      {
+        "command": "phpLab.deleteScratchFile",
+        "title": "Delete",
+        "category": "PHP",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "phpLab.revealScratchesFolder",
+        "title": "Reveal Scratches Folder",
+        "category": "PHP",
+        "icon": "$(folder-opened)"
       }
     ],
     "menus": {
@@ -85,6 +102,14 @@
         {
           "command": "phpLab.runCell",
           "when": "false"
+        },
+        {
+          "command": "phpLab.renameScratchFile",
+          "when": "false"
+        },
+        {
+          "command": "phpLab.deleteScratchFile",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -92,6 +117,35 @@
           "command": "phpLab.runSelection",
           "when": "editorLangId == php",
           "group": "navigation@100"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "phpLab.newScratchFile",
+          "when": "view == phpLab.scratches",
+          "group": "navigation@1"
+        },
+        {
+          "command": "phpLab.revealScratchesFolder",
+          "when": "view == phpLab.scratches",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "phpLab.deleteScratchFile",
+          "when": "view == phpLab.scratches && viewItem == phpLab.scratch",
+          "group": "inline"
+        },
+        {
+          "command": "phpLab.renameScratchFile",
+          "when": "view == phpLab.scratches && viewItem == phpLab.scratch",
+          "group": "1_edit@1"
+        },
+        {
+          "command": "phpLab.deleteScratchFile",
+          "when": "view == phpLab.scratches && viewItem == phpLab.scratch",
+          "group": "1_edit@2"
         }
       ]
     },
@@ -124,7 +178,22 @@
           "markdownDescription": "Show a short result after the last line of the code that ran. Hover over it to see the full output."
         }
       }
-    }
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "phpLab.scratches",
+          "name": "Scratches",
+          "icon": "$(file-code)"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "phpLab.scratches",
+        "contents": "No scratch files yet. Scratches are PHP files to try things out; they are kept outside your projects.\n[New Scratch File](command:phpLab.newScratchFile)"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

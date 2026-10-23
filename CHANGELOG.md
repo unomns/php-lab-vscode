@@ -13,7 +13,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - `PHP: Run Selection` runs the selection, or the current cell when nothing is selected
   (<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>Enter</kbd> / <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Enter</kbd>).
 - `// %%` cells with a **▶ Run Cell** CodeLens.
-- `PHP: New Scratch File` opens an untitled PHP file with sample cells.
+- Scratch files: a **Scratches** view in the Explorer lists them; create (`PHP: New Scratch File`),
+  rename and delete them there. They are kept in PHP Lab's own folder, outside your projects.
 - **PHP Lab** Output channel with the PHP version and execution time.
 - Inline result after the last line that ran, with the full output on hover.
 - PHP errors mapped to the right line of your file, shown as diagnostics.

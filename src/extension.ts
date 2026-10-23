@@ -9,31 +9,28 @@ import { findCellAt, lastCodeLine, parseCells } from './cells';
 import { CellCodeLensProvider, documentLines } from './codeLens';
 import { displayName, PhpLab } from './lab';
 import { RunResult } from './runner';
+import { Scratches } from './scratches';
 
-const SCRATCH_TEMPLATE = `<?php
+/** Returned from activate() so the end-to-end tests can look at the Scratches view. */
+export interface PhpLabApi {
+	scratches: Scratches;
+}
 
-// PHP Lab scratch file: run a cell with "▶ Run Cell" or Cmd/Ctrl+Alt+Enter.
-// Lines starting with "// %%" split the file into cells.
-
-// %% Hello
-$name = 'PHP Lab';
-echo "Hello from {$name} on PHP " . PHP_VERSION . "!\\n";
-
-// %% Arrays
-$numbers = [3, 1, 2];
-sort($numbers);
-print_r($numbers);
-`;
-
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext): PhpLabApi {
 	const lab = new PhpLab();
+	const scratches = new Scratches(context);
 
 	context.subscriptions.push(
 		lab,
+		scratches,
+		vscode.window.registerTreeDataProvider('phpLab.scratches', scratches),
 		vscode.languages.registerCodeLensProvider({ language: 'php' }, new CellCodeLensProvider()),
 		vscode.commands.registerCommand('phpLab.runSelection', runSelection),
 		vscode.commands.registerCommand('phpLab.runCell', runCell),
-		vscode.commands.registerCommand('phpLab.newScratchFile', newScratchFile),
+		vscode.commands.registerCommand('phpLab.newScratchFile', () => scratches.create()),
+		vscode.commands.registerCommand('phpLab.renameScratchFile', (uri: vscode.Uri) => scratches.rename(uri)),
+		vscode.commands.registerCommand('phpLab.deleteScratchFile', (uri: vscode.Uri) => scratches.delete(uri)),
+		vscode.commands.registerCommand('phpLab.revealScratchesFolder', () => scratches.revealFolder()),
 	);
 
 	/** Runs the selected text, or the current cell when nothing is selected. */
@@ -89,14 +86,8 @@ export function activate(context: vscode.ExtensionContext): void {
 			title: `${displayName(document)} · ${what} (${describeLines(cell.startLine, cell.endLine)})`,
 		});
 	}
-}
 
-async function newScratchFile(): Promise<void> {
-	const document = await vscode.workspace.openTextDocument({ language: 'php', content: SCRATCH_TEMPLATE });
-	const editor = await vscode.window.showTextDocument(document);
-	// Put the cursor in the first cell, ready to press the shortcut.
-	const position = new vscode.Position(7, 0);
-	editor.selection = new vscode.Selection(position, position);
+	return { scratches };
 }
 
 /** "lines 3–7" (1-based, as shown in the editor). */

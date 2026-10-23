@@ -4,6 +4,7 @@
  */
 import * as assert from 'assert';
 import * as vscode from 'vscode';
+import { PhpLabApi } from '../../extension';
 import { RunResult } from '../../runner';
 
 async function openPhp(content: string): Promise<vscode.TextEditor> {
@@ -73,10 +74,41 @@ suite('PHP Lab (in VS Code)', () => {
 		assert.deepStrictEqual(ours.map(lens => lens.range.start.line), [1, 3]);
 	});
 
-	test('opens a scratch file', async () => {
+	test('creates a scratch file that is saved on disk', async () => {
 		await vscode.commands.executeCommand('phpLab.newScratchFile');
 		const document = vscode.window.activeTextEditor?.document;
 		assert.strictEqual(document?.languageId, 'php');
-		assert.match(document?.getText() ?? '', /\/\/ %% Hello/);
+		assert.strictEqual(document?.isUntitled, false);
+		assert.match(document?.uri.path ?? '', /\/scratches\/scratch-\d{8}-\d{6}\.php$/);
+
+		// One "Run Cell" button at the top, which runs the whole scratch.
+		const lenses = await vscode.commands.executeCommand<vscode.CodeLens[]>('vscode.executeCodeLensProvider', document!.uri);
+		assert.deepStrictEqual(lenses.filter(l => l.command?.command === 'phpLab.runCell').map(l => l.range.start.line), [2]);
+		assert.match((await runSelection())?.stdout ?? '', /^Hello from PHP Lab on PHP .*!\nArray\n/);
+
+		// A second scratch in the same second gets its own file.
+		await vscode.commands.executeCommand('phpLab.newScratchFile');
+		assert.notStrictEqual(vscode.window.activeTextEditor?.document.uri.toString(), document?.uri.toString());
+	});
+
+	test('lists scratch files in the Explorer view, newest first', async () => {
+		const api = vscode.extensions.getExtension<PhpLabApi>('unomns.php-lab-vscode')!.exports;
+		await vscode.commands.executeCommand('phpLab.newScratchFile');
+		const editor = vscode.window.activeTextEditor!;
+		await editor.edit(edit => edit.insert(new vscode.Position(0, 5), '\n// newest'));
+		await editor.document.save();
+		const uri = editor.document.uri;
+		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+
+		// The view is there, in the Explorer.
+		await vscode.commands.executeCommand('phpLab.scratches.focus');
+
+		const items = await api.scratches.getChildren();
+		assert.strictEqual(items[0].toString(), uri.toString());
+
+		// Clicking an item opens the file.
+		const item = api.scratches.getTreeItem(items[0]);
+		await vscode.commands.executeCommand(item.command!.command, ...item.command!.arguments!);
+		assert.match(vscode.window.activeTextEditor?.document.getText() ?? '', /\/\/ newest/);
 	});
 });
